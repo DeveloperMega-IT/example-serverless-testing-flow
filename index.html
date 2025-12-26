@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Cloud Form</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #232f3e; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #ff9900; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #ec7211; }
+        #status { margin-top: 1rem; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>AWS Registration</h2>
+    <input type="text" id="userName" placeholder="Your Name">
+    <input type="email" id="userEmail" placeholder="Your Verified Email">
+    <button onclick="sendData()">Submit to AWS</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    async function sendData() {
+        const name = document.getElementById('userName').value;
+        const email = document.getElementById('userEmail').value;
+        const status = document.getElementById('status');
+        
+        // Use your working API ID here
+        const apiId = "lv02y8ixo4";
+        const region = "ap-south-1";
+        const url = `https://${apiId}.execute-api.${region}.amazonaws.com/example?name=${name}&email=${email}`;
+
+        status.style.color = "blue";
+        status.innerText = "Connecting to Lambda...";
+
+        try {
+            // This is the Fetch API from your notes
+            const response = await fetch(url);
+            if (response.ok) {
+                status.style.color = "green";
+                status.innerText = "✔ Data Saved & Email Sent!";
+            } else {
+                status.style.color = "red";
+                status.innerText = "❌ Error: " + response.statusText;
+            }
+        } catch (err) {
+            status.style.color = "red";
+            status.innerText = "❌ Connection Failed";
+        }
+    }
+</script>
+
+</body>
+</html>
