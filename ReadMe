@@ -1,0 +1,198 @@
+🏦 Loan Application System - AWS Cloud Project
+This project demonstrates a serverless Loan Application System using AWS services. It collects user data via a frontend form, stores it in DynamoDB, and sends a confirmation email via Amazon SES.
+
+📌 Architecture Overview
+Frontend: HTML/JS form (running on VS Code Live Server).
+
+API Layer: AWS API Gateway (HTTP API).
+
+Compute: AWS Lambda (Python 3.12).
+
+Database: AWS DynamoDB.
+
+Notification: Amazon SES (Simple Email Service).
+
+🔹 Phase 1: DynamoDB Database Setup
+We need a NoSQL database to store the loan application details submitted by users.
+
+Step 1: Create Table
+Go to AWS Console → Search for DynamoDB.
+
+Click Create table.
+
+Enter the following details:
+
+Table name: LoanApplications
+
+Partition key: applicationId (Select String)
+
+Capacity settings: Select On-demand.
+
+Encryption: Keep as Default.
+
+Click Create table.
+
+Note: The data stored will look like this:
+
+JSON
+{
+  "applicationId": "a12345",
+  "name": "Ravi Kumar",
+  "email": "ravi@gmail.com",
+  "mobile": "9876543210",
+  "loanAmount": "500000",
+  "loanType": "Home Loan",
+  "timestamp": "2026-01-22T10:30"
+}
+🔹 Phase 2: SES Email Verification
+We use Amazon SES to send confirmation emails. Since the account is in Sandbox Mode, you must verify the sender and receiver emails.
+
+Step 2: Verify Email Identity
+Go to AWS Console → Search for Amazon SES.
+
+Click Verified identities in the sidebar.
+
+Click Create identity and choose Email address.
+
+Enter your email (e.g., yourmail@gmail.com).
+
+Click Verify.
+
+📩 Action Required: Go to your Gmail inbox and click the verification link sent by AWS.
+
+⚠️ Important Sandbox Limitation: In the free tier (Sandbox), you can only send emails TO and FROM verified email addresses. This is sufficient for college projects and testing.
+
+🔹 Phase 3: IAM Role for Lambda
+The Lambda function needs permission to access the Database (DynamoDB) and Email Service (SES).
+
+Step 3: Create IAM Role
+Go to IAM → Roles → Create role.
+
+Trusted Entity: Select AWS Service → Choose Lambda.
+
+Add Permissions: Search for and attach these three policies:
+
+AmazonDynamoDBFullAccess
+
+AmazonSESFullAccess
+
+AWSLambdaBasicExecutionRole
+
+Role Name: Enter LoanLambdaRole.
+
+Click Create role.
+
+🔹 Phase 4: Lambda Function
+This is the backend logic that processes the data.
+
+Step 4: Create Function
+Go to AWS Lambda → Create function.
+
+Function name: LoanApplicationFunction.
+
+Runtime: Python 3.12.
+
+Permissions:
+
+Expand "Change default execution role".
+
+Select Use an existing role.
+
+Choose LoanLambdaRole (created in Phase 3).
+
+Click Create function.
+
+Code Deployment: Paste your Python code into the code editor and click Deploy.
+
+🔹 Phase 5: API Gateway (The Bridge)
+Browsers cannot directly trigger Lambda functions securely. We use API Gateway to create a public URL (endpoint).
+
+Shutterstock
+
+Step 5.1: Create the API
+Go to API Gateway.
+
+Click Create API → Select HTTP API → Click Build.
+
+Step 5.2: Integration
+Integrations: Choose Lambda.
+
+Select Function: Choose LoanApplicationFunction.
+
+API Name: Enter LoanAPI.
+
+Step 5.3: Configure Routes
+We need a POST route because we are sending data (JSON) to the server securely.
+
+Method: POST
+
+Resource path: /apply-loan
+
+Click Next.
+
+Step 5.4: Stages
+Leave the stage name as $default or create a custom stage named prod.
+
+Why prod? It stands for Production. It is an industry standard to version APIs (e.g., dev, test, prod).
+
+Click Create.
+
+✅ Final API URL
+Your API Endpoint will look like this: https://abc123.execute-api.ap-south-1.amazonaws.com/apply-loan
+
+🔹 Phase 6: CORS Configuration (Crucial)
+If you try to connect your Frontend to the API now, you will get a CORS Error in the browser console.
+
+Why?
+Browsers block requests from one domain (your localhost) to another (AWS) for security. We must explicitly allow it.
+
+Step 6: Enable CORS
+Go to your API in API Gateway.
+
+Click CORS in the sidebar.
+
+Access-Control-Allow-Origin: Enter * (Allows all domains).
+
+Access-Control-Allow-Headers: Enter *.
+
+Access-Control-Allow-Methods: Add POST and OPTIONS.
+
+Click Save.
+
+Note: The OPTIONS method is automatically handled by the browser as a "pre-flight" check to see if the server accepts the request.
+
+🔹 Phase 7: Frontend & Deployment
+You have a separate HTML file for the user interface.
+
+How to Run the Frontend
+❌ Do NOT simply double-click the .html file to open it in Chrome (file:// protocol).
+
+Reason: Browsers treat local files as insecure and will block the connection to AWS API Gateway due to CORS policies.
+
+✅ Correct Way:
+
+Open the folder in VS Code.
+
+Install the "Live Server" extension.
+
+Right-click your HTML file and select "Open with Live Server".
+
+This runs your site on a local server (e.g., http://127.0.0.1:5500), which satisfies CORS requirements.
+
+🚀 Final Workflow
+User fills out the form on the Frontend and clicks Submit.
+
+Data is sent via API Gateway (POST request).
+
+Lambda receives the data.
+
+Lambda inserts the record into DynamoDB.
+
+Lambda uses SES to send a confirmation email to the user.
+
+User sees a "Success" message on the screen.
+
+
+
+
+change the email, db name and api url accrdingly in html and lambda 
